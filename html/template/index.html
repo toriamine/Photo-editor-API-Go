@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Приложение обработки изображений</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #f26b38;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        input[type=file], input[type=text], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #f26b38;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e05a30;
+        }
+        #image-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        #image-list > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+        #image-list img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #image-list button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Приложение обработки изображений</h1>
+
+    <h2>Загрузить изображение</h2>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="image" required>
+        <button type="submit">Загрузить</button>
+    </form>
+
+    <h2>Применить фильтры</h2>
+    <form id="filter-form">
+        <select name="filter">
+            <option value="grayscale">Оттенки серого</option>
+            <option value="sepia">Сепия</option>
+            <option value="blur">Размытие</option>
+            <option value="sharpen">Резкость</option>
+        </select>
+        <input type="text" name="filename" placeholder="Имя файла" required>
+        <button type="submit">Применить фильтр</button>
+    </form>
+
+    <h2>Изображения</h2>
+    <div id="image-list"></div>
+</div>
+
+<script>
+    document.getElementById('upload-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                alert(data.message);
+                listImages();
+            })
+            .catch(function(error) {
+                alert('Ошибка: ' + error);
+            });
+    });
+
+    document.getElementById('filter-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        fetch('/filter/' + formData.get('filter') + '?filename=' + formData.get('filename'), {
+            method: 'POST'
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                alert(data.message);
+
+                listImages();
+            })
+            .catch(function(error) {
+                alert('Ошибка: ' + error);
+            });
+    });
+
+    function listImages() {
+        fetch('/images')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                var imageList = document.getElementById('image-list');
+                imageList.innerHTML = '';
+                data.forEach(function(filename) {
+                    var img = document.createElement('img');
+                    img.src = '/download/' + filename;
+                    img.width = 200;
+                    var downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = 'Скачать';
+                    downloadBtn.addEventListener('click', function() {
+                        window.location.href = '/download/' + filename;
+                    });
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Удалить';
+                    deleteBtn.addEventListener('click', function() {
+                        deleteImage(filename);
+                    });
+                    var imageContainer = document.createElement('div');
+                    imageContainer.appendChild(img);
+                    imageContainer.appendChild(downloadBtn);
+                    imageContainer.appendChild(deleteBtn);
+                    imageList.appendChild(imageContainer);
+                });
+            })
+            .catch(function(error) {
+                alert('Ошибка: ' + error);
+            });
+    }
+
+
+    function deleteImage(filename) {
+        fetch('/images/' + filename, {
+            method: 'DELETE'
+        })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                alert(data.message);
+                listImages();
+            })
+            .catch(function(error) {
+                alert('Ошибка: ' + error);
+            });
+    }
+
+    listImages();
+</script>
+</body>
+</html>
