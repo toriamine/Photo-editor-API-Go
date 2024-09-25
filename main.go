@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+"github.com/lib/pq"
 )
 
 func main() {
