@@ -14,3 +14,7 @@
 - Gin Web Framework
 - Библиотека обработки изображений "github.com/disintegration/imaging"
 - Docker
+
+Дополнительно:
+- CI/CD
+- Dockerfile
