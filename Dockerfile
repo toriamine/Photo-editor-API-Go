@@ -4,7 +4,7 @@ FROM golang:alpine AS builder
 LABEL stage=gobuilder
 
 # Отключаем CGO (нужно для совместимости)
-ENV CGO_ENABLED = 0
+ENV CGO_ENABLED=0
 
 # Устанавливаем зависимости
 RUN apk update --no-cache && apk add --no-cache tzdata
@@ -29,7 +29,7 @@ FROM scratch
 # Копируем сертификаты и таймзону
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /usr/share/zoneinfo/Europe/Moscow /usr/share/zoneinfo/Europe/Moscow
-ENV TZ = Europe/Moscow
+ENV TZ=Europe/Moscow
 
 # Указываем рабочую директорию
 WORKDIR /app

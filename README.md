@@ -18,3 +18,23 @@
 Дополнительно:
 - CI/CD
 - Dockerfile
+
+# PhotoEditorAPI
+
+## Building the Docker Image
+
+To build the Docker image, run the following command in the project directory:
+
+```sh
+docker build -t photoeditorapi .
+```
+
+## Running the Docker Container
+
+To run the Docker container, use the following command:
+
+```sh
+docker run -p 8081:8081 -v $(pwd)/uploads:/app/uploads photoeditorapi
+```
+
+This will map the `uploads` directory on your host machine to the `uploads` directory in the container, ensuring that the photos are accessible.

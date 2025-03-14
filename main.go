@@ -8,11 +8,13 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-"github.com/lib/pq"
 )
 
 func main() {
 	r := gin.Default()
+
+	// Serve static files from the uploads directory
+	r.Static("/uploads", "./uploads")
 
 	// Загрузка шаблонов
 	r.LoadHTMLGlob("/app/html/template/*")
